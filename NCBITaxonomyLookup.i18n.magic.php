@@ -1,14 +1,13 @@
 <?php
 /**
-
  * @file
  * @author WikiTeq
  */
-$magicWords = array();
+$magicWords = [];
 
 /** English
  * @author WikiTeq
  */
-$magicWords['en'] = array(
-	'taxonomy' => array( 0, 'taxonomy' )
-);
+$magicWords['en'] = [
+	'taxonomy' => [ 0, 'taxonomy' ]
+];

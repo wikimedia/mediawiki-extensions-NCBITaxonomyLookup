@@ -8,7 +8,7 @@ use SimpleXMLElement;
 class NCBITaxonomyLookup {
 
 	/**
-	 * @param $taxonomyId
+	 * @param int $taxonomyId
 	 *
 	 * @return bool|SimpleXMLElement
 	 */
@@ -19,7 +19,7 @@ class NCBITaxonomyLookup {
 
 		// Prepare TTL as UNIX stamp
 		$cacheTTL = $wgNCBITaxonomyLookupCacheTTL;
-		if( $wgNCBITaxonomyLookupCacheRandomizeTTL ) {
+		if ( $wgNCBITaxonomyLookupCacheRandomizeTTL ) {
 			$cacheTTL = mt_rand(
 				abs( $wgNCBITaxonomyLookupCacheTTL - $wgNCBITaxonomyLookupCacheTTL / 10 ),
 				abs( $wgNCBITaxonomyLookupCacheTTL + $wgNCBITaxonomyLookupCacheTTL / 10 )
@@ -33,7 +33,7 @@ class NCBITaxonomyLookup {
 		if ( $result ) {
 			// We have something, let's check TTL
 			$ttl = NCBITaxonomyLookupCache::getCacheTTL( $taxonomyId );
-			if( $ttl ) {
+			if ( $ttl ) {
 				// Check if we did pass the time point
 				if ( time() > (int)$ttl ) {
 					// Try to fetch new data
@@ -51,17 +51,18 @@ class NCBITaxonomyLookup {
 			// Test for timeout on the API
 			if ( !$result ) {
 				// Something is wrong with fetching the data, try to recover from cache
-				if( $cached && $wgNCBITaxonomyApiTimeoutFallbackToCache ) {
+				if ( $cached && $wgNCBITaxonomyApiTimeoutFallbackToCache ) {
 					$result = $cached;
 					// Prolong the cached value TTL
 					NCBITaxonomyLookupCache::setCache( $taxonomyId, $result, $cacheTTL );
-				}else{
+				} else {
 					// We have nothing left to do
 					return false;
 				}
 			}
 		}
 
+		// @phan-suppress-next-line PhanRedundantCondition
 		if ( $result ) {
 			try {
 				$xml = new SimpleXMLElement( $result );
@@ -77,7 +78,7 @@ class NCBITaxonomyLookup {
 	}
 
 	/**
-	 * @param $taxonomyId
+	 * @param int $taxonomyId
 	 *
 	 * @return bool|string
 	 */
@@ -88,31 +89,31 @@ class NCBITaxonomyLookup {
 			   . '&rettype=fasta'
 			   . '&retmode=xml'
 			   . '&id=' . $taxonomyId;
-		if( $wgNCBITaxonomyApiKey ) {
+		if ( $wgNCBITaxonomyApiKey ) {
 			$uri .= '&api_key=' . $wgNCBITaxonomyApiKey;
 		}
 		return self::fetchRemote( $uri );
 	}
 
 	/**
-	 * @param $uri
+	 * @param string $uri
 	 *
 	 * @return bool|string
 	 */
 	protected static function fetchRemote( $uri ) {
 		global $wgNCBITaxonomyApiTimeout;
 		try {
-			$ctx = stream_context_create([
+			$ctx = stream_context_create( [
 				'http' => [
 					'timeout' => $wgNCBITaxonomyApiTimeout
 				]
-			]);
+			] );
 			$result = file_get_contents( $uri, false, $ctx );
 		}
 		catch ( Exception $e ) {
 			$curl = curl_init( $uri );
 			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-			curl_setopt( $curl, CURLOPT_TIMEOUT, $wgNCBITaxonomyApiTimeout);
+			curl_setopt( $curl, CURLOPT_TIMEOUT, $wgNCBITaxonomyApiTimeout );
 			$result = curl_exec( $curl );
 			curl_close( $curl );
 		}

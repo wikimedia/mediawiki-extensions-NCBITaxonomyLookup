@@ -7,9 +7,9 @@
 	"version": "1.0",
 	"type": "parserhook",
 	"AutoloadClasses": {
-		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "NCBITaxonomyLookup.hooks.php",
-		"NCBITaxonomyLookup\\NCBITaxonomyLookupCache": "NCBITaxonomyLookupCache.php",
-		"NCBITaxonomyLookup\\NCBITaxonomyLookup": "NCBITaxonomyLookup.php"
+		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "includes/NCBITaxonomyLookupHooks.php",
+		"NCBITaxonomyLookup\\NCBITaxonomyLookupCache": "includes/NCBITaxonomyLookupCache.php",
+		"NCBITaxonomyLookup\\NCBITaxonomyLookup": "includes/NCBITaxonomyLookup.php"
 	},
 	"config": {
 		"NCBITaxonomyLookupApiURL": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",

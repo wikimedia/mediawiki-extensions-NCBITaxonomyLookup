@@ -12,13 +12,13 @@ class NCBITaxonomyLookupCache {
 	/**
 	 * Fetches cached value
 	 *
-	 * @param $taxonomyId
+	 * @param int $taxonomyId
 	 *
-	 * @return string|boolean
+	 * @return string|bool
 	 */
 	public static function getCache( $taxonomyId ) {
-		$cache = wfGetCache( CACHE_ANYTHING );
-		$key = wfMemcKey( 'ncbitaxonomylookup', $taxonomyId );
+		$cache = \ObjectCache::getInstance( CACHE_ANYTHING );
+		$key = $cache->makeKey( 'ncbitaxonomylookup', $taxonomyId );
 		$cached = $cache->get( $key );
 		wfDebugLog( "NCBITaxonomyLookup",
 			__METHOD__ . ": got " . var_export( $cached, true ) .
@@ -29,46 +29,46 @@ class NCBITaxonomyLookupCache {
 	/**
 	 * Fetches the cache record with TTL value
 	 *
-	 * @param $taxonomyId
+	 * @param int $taxonomyId
 	 *
 	 * @return mixed
 	 */
 	public static function getCacheTTL( $taxonomyId ) {
-		$cache = wfGetCache( CACHE_ANYTHING );
-		$key = wfMemcKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
+		$cache = \ObjectCache::getInstance( CACHE_ANYTHING );
+		$key = $cache->makeKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
 		return $cache->get( $key );
 	}
 
 	/**
 	 * Stores the value and TTL in cache
 	 *
-	 * @param $taxonomyId
-	 * @param $data
-	 * @param integer $cache_expire
+	 * @param int $taxonomyId
+	 * @param string $data
+	 * @param int $cache_expire
 	 */
 	public static function setCache( $taxonomyId, $data, $cache_expire = 0 ) {
-		$cache = wfGetCache( CACHE_ANYTHING );
-		$key = wfMemcKey( 'ncbitaxonomylookup', $taxonomyId );
+		$cache = \ObjectCache::getInstance( CACHE_ANYTHING );
+		$key = $cache->makeKey( 'ncbitaxonomylookup', $taxonomyId );
 		wfDebugLog( "NCBITaxonomyLookup",
 			__METHOD__ . ": caching " . var_export( $data, true ) .
 			" from Google." );
 		$cache->set( $key, $data );
 		// Separately store the artificial TTL
-		$ttlKey = wfMemcKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
+		$ttlKey = $cache->makeKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
 		$cache->set( $ttlKey, $cache_expire );
 	}
 
 	/**
 	 * Expires the cache record and TTL
 	 *
-	 * @param $taxonomyId
+	 * @param int $taxonomyId
 	 * @deprecated perhaps we dont need this at all since setCache will overwrite existing records
 	 */
 	public static function deleteCache( $taxonomyId ) {
-		$cache = wfGetCache( CACHE_ANYTHING );
-		$key = wfMemcKey( 'ncbitaxonomylookup', $taxonomyId );
+		$cache = \ObjectCache::getInstance( CACHE_ANYTHING );
+		$key = $cache->makeKey( 'ncbitaxonomylookup', $taxonomyId );
 		$cache->delete( $key );
-		$ttlKey = wfMemcKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
+		$ttlKey = $cache->makeKey( 'ncbitaxonomylookup_ttl', $taxonomyId );
 		$cache->delete( $ttlKey );
 	}
 }
