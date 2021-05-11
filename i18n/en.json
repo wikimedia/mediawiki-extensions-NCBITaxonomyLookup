@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"WikiTeq"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Pulls data from the NCBI taxonomy API into wiki pages"
+}

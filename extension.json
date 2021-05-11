@@ -1,0 +1,36 @@
+{
+	"name": "NCBITaxonomyLookup",
+	"author": "WikiTeq",
+	"url": "https://www.mediawiki.org/wiki/Extension:NCBITaxonomyLookup",
+	"descriptionmsg": "ncbitaxonomylookup-desc",
+	"license-name": "GPL-2.0-or-later",
+	"version": "1.0",
+	"type": "parserhook",
+	"AutoloadClasses": {
+		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "NCBITaxonomyLookup.hooks.php",
+		"NCBITaxonomyLookup\\NCBITaxonomyLookupCache": "NCBITaxonomyLookupCache.php",
+		"NCBITaxonomyLookup\\NCBITaxonomyLookup": "NCBITaxonomyLookup.php"
+	},
+	"config": {
+		"NCBITaxonomyLookupApiURL": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
+		"NCBITaxonomyLookupCacheTTL": 0,
+		"NCBITaxonomyLookupCacheRandomizeTTL": false,
+		"NCBITaxonomyApiTimeoutFallbackToCache": false,
+		"NCBITaxonomyApiTimeout": 60,
+		"NCBITaxonomyApiKey": false
+	},
+	"Hooks": {
+		"ParserFirstCallInit": [
+			"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks::onParserFirstCallInit"
+		]
+	},
+	"MessagesDirs": {
+		"NCBITaxonomyLookup": [
+			"i18n"
+		]
+	},
+	"ExtensionMessagesFiles": {
+		"NCBITaxonomyLookupMagic": "NCBITaxonomyLookup.i18n.magic.php"
+	},
+	"manifest_version": 1
+}
