@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Nickthijssen1994"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Haalt data op van de NCBI taxonomie API naar wiki pagina's"
+}

@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Sabelöga"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Hämtar data från NCBI taxonomy API till wikisidor"
+}

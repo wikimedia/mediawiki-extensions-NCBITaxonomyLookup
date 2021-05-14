@@ -1,0 +1,6 @@
+{
+	"@metadata": {
+		"authors": []
+	},
+	"ncbitaxonomylookup-desc": "Übernimmt Daten aus der NCBI-Taxonomie-API in Wikiseiten"
+}
