@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Gomoko"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Extrait les données de l’API de taxonomie NCBI dans les pages wiki"
+}
