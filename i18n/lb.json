@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Robby"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Setzt Date aus der NCBI-Taxonomie-API a Wiki-Säiten"
+}
