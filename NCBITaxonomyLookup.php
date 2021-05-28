@@ -17,6 +17,16 @@ class NCBITaxonomyLookup {
 			   $wgNCBITaxonomyLookupCacheRandomizeTTL,
 			   $wgNCBITaxonomyApiTimeoutFallbackToCache;
 
+		// Prepare TTL as UNIX stamp
+		$cacheTTL = $wgNCBITaxonomyLookupCacheTTL;
+		if( $wgNCBITaxonomyLookupCacheRandomizeTTL ) {
+			$cacheTTL = mt_rand(
+				abs( $wgNCBITaxonomyLookupCacheTTL - $wgNCBITaxonomyLookupCacheTTL / 10 ),
+				abs( $wgNCBITaxonomyLookupCacheTTL + $wgNCBITaxonomyLookupCacheTTL / 10 )
+			);
+		}
+		$cacheTTL += time();
+
 		// Do we have records in cache and its TTL is not expired yet?
 		$result = $cached = NCBITaxonomyLookupCache::getCache( $taxonomyId );
 
@@ -38,20 +48,8 @@ class NCBITaxonomyLookup {
 		if ( !$result ) {
 			// We don't have anything for this taxonomy, do the actual fetch
 			$result = self::fetchApi( $taxonomyId );
-			// Prepare TTL as UNIX stamp
-			$cacheTTL = $wgNCBITaxonomyLookupCacheTTL;
-			if( $wgNCBITaxonomyLookupCacheRandomizeTTL ) {
-				$cacheTTL = mt_rand(
-					abs( $wgNCBITaxonomyLookupCacheTTL - $wgNCBITaxonomyLookupCacheTTL / 10 ),
-					abs( $wgNCBITaxonomyLookupCacheTTL + $wgNCBITaxonomyLookupCacheTTL / 10 )
-				);
-			}
-			$cacheTTL += time();
 			// Test for timeout on the API
-			if( $result ) {
-				// Set cached value
-				NCBITaxonomyLookupCache::setCache( $taxonomyId, $result, $cacheTTL );
-			} else {
+			if ( !$result ) {
 				// Something is wrong with fetching the data, try to recover from cache
 				if( $cached && $wgNCBITaxonomyApiTimeoutFallbackToCache ) {
 					$result = $cached;
@@ -65,7 +63,14 @@ class NCBITaxonomyLookup {
 		}
 
 		if ( $result ) {
-			return new SimpleXMLElement( $result );
+			try {
+				$xml = new SimpleXMLElement( $result );
+				// Set cached value
+				NCBITaxonomyLookupCache::setCache( $taxonomyId, $result, $cacheTTL );
+				return $xml;
+			} catch ( Exception $e ) {
+				return false;
+			}
 		}
 
 		return false;
