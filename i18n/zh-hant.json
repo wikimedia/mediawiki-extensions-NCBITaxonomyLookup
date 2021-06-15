@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Kly"
+		]
+	},
+	"ncbitaxonomylookup-desc": "從 NCBI taxonomy API 下拉資料到 wiki 頁面"
+}
