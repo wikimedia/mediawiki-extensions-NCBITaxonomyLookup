@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"DDPAT"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Збирає дані з таксономічного API NCBI на вікісторінки"
+}
