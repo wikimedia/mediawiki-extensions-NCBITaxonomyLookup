@@ -6,6 +6,9 @@
 	"license-name": "GPL-2.0-or-later",
 	"version": "1.0",
 	"type": "parserhook",
+	"requires": {
+		"MediaWiki": ">= 1.31.0"
+	},
 	"AutoloadClasses": {
 		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "includes/NCBITaxonomyLookupHooks.php",
 		"NCBITaxonomyLookup\\NCBITaxonomyLookupCache": "includes/NCBITaxonomyLookupCache.php",
