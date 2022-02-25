@@ -1,7 +1,8 @@
 {
 	"@metadata": {
 		"authors": [
-			"DDPAT"
+			"DDPAT",
+			"Ice bulldog"
 		]
 	},
 	"ncbitaxonomylookup-desc": "Збирає дані з таксономічного API NCBI на вікісторінки"
