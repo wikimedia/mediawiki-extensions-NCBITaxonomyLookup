@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"StarrySky"
+		]
+	},
+	"ncbitaxonomylookup-desc": "将数据从 NCBI 分类 API 提取到 wiki 页面"
+}
