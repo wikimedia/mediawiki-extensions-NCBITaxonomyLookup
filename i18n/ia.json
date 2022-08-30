@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"McDutchie"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Extrahe datos del API taxonomic de NCBI e los insere in paginas wiki"
+}
