@@ -109,8 +109,7 @@ class NCBITaxonomyLookup {
 				]
 			] );
 			$result = file_get_contents( $uri, false, $ctx );
-		}
-		catch ( Exception $e ) {
+		} catch ( Exception $e ) {
 			$curl = curl_init( $uri );
 			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
 			curl_setopt( $curl, CURLOPT_TIMEOUT, $wgNCBITaxonomyApiTimeout );
