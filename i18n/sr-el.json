@@ -1,0 +1,6 @@
+{
+	"@metadata": {
+		"authors": []
+	},
+	"ncbitaxonomylookup-desc": "Povlači podatke iz NCBI taksonomije API-ja na viki stranice."
+}
