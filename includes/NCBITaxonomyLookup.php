@@ -3,77 +3,75 @@
 namespace NCBITaxonomyLookup;
 
 use Exception;
-use SimpleXMLElement;
+use MediaWiki\MediaWikiServices;
+use WanObjectCache;
 
 class NCBITaxonomyLookup {
 
 	/**
-	 * @param int $taxonomyId
+	 * Get the result from cache or regenerate it.
 	 *
-	 * @return bool|SimpleXMLElement
+	 * @param string $id The id number to lookup
+	 * @return string|bool The XML as a string, or false on failure
 	 */
-	public static function getTaxonomyDataXML( $taxonomyId ) {
-		global $wgNCBITaxonomyLookupCacheTTL,
-			   $wgNCBITaxonomyLookupCacheRandomizeTTL,
-			   $wgNCBITaxonomyApiTimeoutFallbackToCache;
+	public static function getCachedTaxonomyData( $id ) {
+		global $wgNCBITaxonomyApiTimeoutFallbackToCache,
+			$wgNCBITaxonomyLookupCacheTTL,
+			$wgNCBITaxonomyApiTimeout;
 
-		// Prepare TTL as UNIX stamp
-		$cacheTTL = $wgNCBITaxonomyLookupCacheTTL;
-		if ( $wgNCBITaxonomyLookupCacheRandomizeTTL ) {
-			$cacheTTL = mt_rand(
-				abs( $wgNCBITaxonomyLookupCacheTTL - $wgNCBITaxonomyLookupCacheTTL / 10 ),
-				abs( $wgNCBITaxonomyLookupCacheTTL + $wgNCBITaxonomyLookupCacheTTL / 10 )
-			);
-		}
-		$cacheTTL += time();
+		wfDebugLog( "NCBITaxonomyLookup", __METHOD__ . " Looking up $id" );
+		$cache = MediaWikiServices::getInstance()->getMainWANObjectCache();
 
-		// Do we have records in cache and its TTL is not expired yet?
-		$result = $cached = NCBITaxonomyLookupCache::getCache( $taxonomyId );
+		$key = $cache->makeKey( 'ncbitaxonomylookup', $id );
+		return $cache->getWithSetCallback(
+			$key,
+			$wgNCBITaxonomyLookupCacheTTL,
+			static function ( $oldVal, &$ttl ) use ( $id ) {
+				return self::getTaxonomyDataXML( (int)$id, $oldVal, $ttl );
+			},
+			[
+				// Keep a version around in process. We often look up the same
+				// one over and over again when parsing pages, so don't go to redis
+				// each time if we have already looked it up.
+				'pcTTL' => WANObjectCache::TTL_PROC_LONG,
+				// We often look the same key up over and over again. Store last 100
+				'pcGroup' => 'ncbitaxonomylookup:100',
+				// Keep stale stuff around and fallback to it if site doesn't respond.
+				'staleTTL' => $wgNCBITaxonomyApiTimeoutFallbackToCache ? 60 * 60 * 24 * 30 : 0,
+				// If this is going to expire in the next 12 hours, do an automatic
+				// refresh. Automatic refreshes happen after the page is sent
+				// so are less visible to the user than a stale key.
+				'lowTTL' => 60 * 60 * 12,
+				// If we have a stale value, and someone else is refetching,
+				// use the stale value instead of multiple people refetching.
+				'lockTSE' => $wgNCBITaxonomyApiTimeout + 3,
+			]
+		);
+	}
 
-		if ( $result ) {
-			// We have something, let's check TTL
-			$ttl = NCBITaxonomyLookupCache::getCacheTTL( $taxonomyId );
-			if ( $ttl ) {
-				// Check if we did pass the time point
-				if ( time() > (int)$ttl ) {
-					// Try to fetch new data
-					$result = false;
-				}
-			} else {
-				// We should not land here ever, but if we do - pretend we have no cached values
-				$result = $cached = false;
-			}
-		}
-
-		if ( !$result ) {
-			// We don't have anything for this taxonomy, do the actual fetch
-			$result = self::fetchApi( $taxonomyId );
-			// Test for timeout on the API
-			if ( !$result ) {
-				// Something is wrong with fetching the data, try to recover from cache
-				if ( $cached && $wgNCBITaxonomyApiTimeoutFallbackToCache ) {
-					$result = $cached;
-					// Prolong the cached value TTL
-					NCBITaxonomyLookupCache::setCache( $taxonomyId, $result, $cacheTTL );
-				} else {
-					// We have nothing left to do
-					return false;
-				}
-			}
+	/**
+	 * @param int $taxonomyId
+	 * @param string $oldVal Stale data
+	 * @param int &$ttl Override how long to cache value for
+	 * @return bool|string
+	 */
+	public static function getTaxonomyDataXML( $taxonomyId, $oldVal, &$ttl ) {
+		$newResult = self::fetchApi( $taxonomyId );
+		if ( $newResult ) {
+			return $newResult;
 		}
 
-		// @phan-suppress-next-line PhanRedundantCondition
-		if ( $result ) {
-			try {
-				$xml = new SimpleXMLElement( $result );
-				// Set cached value
-				NCBITaxonomyLookupCache::setCache( $taxonomyId, $result, $cacheTTL );
-				return $xml;
-			} catch ( Exception $e ) {
-				return false;
-			}
+		if ( $oldVal ) {
+			wfDebugLog( "NCBITaxonomyLookup", "Using stale value from cache" );
+			// Our api request failed, but at least we still have a
+			// stale result. Return it and cache it just for a little bit.
+			$ttl = 60 * 30;
+			return $oldVal;
 		}
 
+		wfDebugLog( "NCBITaxonomyLookup", "Could not fetch and no stale version." );
+		// We have nothing!
+		$ttl = WANObjectCache::TTL_UNCACHEABLE;
 		return false;
 	}
 
@@ -116,6 +114,10 @@ class NCBITaxonomyLookup {
 			$result = curl_exec( $curl );
 			curl_close( $curl );
 		}
+		wfDebugLog( "NCBITaxonomyLookup",
+				__METHOD__ . ": got " . var_export( $result, true ) .
+				" from internet."
+		);
 		return $result;
 	}
 

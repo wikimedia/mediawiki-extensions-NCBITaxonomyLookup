@@ -4,22 +4,20 @@
 	"url": "https://www.mediawiki.org/wiki/Extension:NCBITaxonomyLookup",
 	"descriptionmsg": "ncbitaxonomylookup-desc",
 	"license-name": "GPL-2.0-or-later",
-	"version": "1.0",
+	"version": "1.1",
 	"type": "parserhook",
 	"requires": {
 		"MediaWiki": ">= 1.31.0"
 	},
 	"AutoloadClasses": {
 		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "includes/NCBITaxonomyLookupHooks.php",
-		"NCBITaxonomyLookup\\NCBITaxonomyLookupCache": "includes/NCBITaxonomyLookupCache.php",
 		"NCBITaxonomyLookup\\NCBITaxonomyLookup": "includes/NCBITaxonomyLookup.php"
 	},
 	"config": {
 		"NCBITaxonomyLookupApiURL": "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi",
-		"NCBITaxonomyLookupCacheTTL": 0,
-		"NCBITaxonomyLookupCacheRandomizeTTL": false,
-		"NCBITaxonomyApiTimeoutFallbackToCache": false,
-		"NCBITaxonomyApiTimeout": 60,
+		"NCBITaxonomyLookupCacheTTL": 1296000,
+		"NCBITaxonomyApiTimeoutFallbackToCache": true,
+		"NCBITaxonomyApiTimeout": 30,
 		"NCBITaxonomyApiKey": false
 	},
 	"Hooks": {

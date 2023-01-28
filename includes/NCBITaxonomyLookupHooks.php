@@ -4,6 +4,7 @@ namespace NCBITaxonomyLookup;
 
 use Exception;
 use Parser;
+use SimpleXMLElement;
 
 class NCBITaxonomyLookupHooks {
 
@@ -16,7 +17,7 @@ class NCBITaxonomyLookupHooks {
 
 	/**
 	 * @param Parser $parser
-	 * @param int|null $taxonomyId
+	 * @param string|null $taxonomyId
 	 * @param string|null $xpath
 	 *
 	 * @return array
@@ -33,11 +34,16 @@ class NCBITaxonomyLookupHooks {
 			throw new Exception( 'The $xpath parameter must be set' );
 		}
 
-		$data = NCBITaxonomyLookup::getTaxonomyDataXML( $taxonomyId );
+		$data = NCBITaxonomyLookup::getCachedTaxonomyData( $taxonomyId );
 		$value = '';
 		if ( $data ) {
 			// Checking xpath
-			$found = $data->xpath( $xpath );
+			try {
+				$xml = new SimpleXMLElement( $data );
+			} catch ( Exception $e ) {
+				return [ '' ];
+			}
+			$found = $xml->xpath( $xpath );
 			// Getting the first element value
 			if ( $found && count( $found ) ) {
 				// Internal to string conversion
