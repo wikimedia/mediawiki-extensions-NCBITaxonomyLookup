@@ -2,7 +2,6 @@
 
 namespace NCBITaxonomyLookup;
 
-use Exception;
 use MediaWiki\MediaWikiServices;
 use WanObjectCache;
 
@@ -99,20 +98,44 @@ class NCBITaxonomyLookup {
 	 * @return bool|string
 	 */
 	protected static function fetchRemote( $uri ) {
-		global $wgNCBITaxonomyApiTimeout;
-		try {
+		global $wgNCBITaxonomyApiTimeout, $wgHTTPProxy;
+
+		// Curl is faster so generally prefer it. Use url fopen if curl not installed.
+		if ( !function_exists( 'curl_init' ) ) {
 			$ctx = stream_context_create( [
 				'http' => [
-					'timeout' => $wgNCBITaxonomyApiTimeout
+					'timeout' => $wgNCBITaxonomyApiTimeout,
+					'user_agent' => 'MediaWiki NCBITaxonomy'
 				]
 			] );
 			$result = file_get_contents( $uri, false, $ctx );
-		} catch ( Exception $e ) {
-			$curl = curl_init( $uri );
-			curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
-			curl_setopt( $curl, CURLOPT_TIMEOUT, $wgNCBITaxonomyApiTimeout );
+		} else {
+			// Reuse curl handle. This allows connection reuse which can
+			// save re-setting up TCP & TLS handshake.
+			static $curl;
+			if ( !$curl ) {
+				$curl = curl_init();
+				curl_setopt( $curl, CURLOPT_USERAGENT, 'MediaWiki NCBITaxonomy' );
+				curl_setopt( $curl, CURLOPT_RETURNTRANSFER, 1 );
+				curl_setopt( $curl, CURLOPT_TIMEOUT, $wgNCBITaxonomyApiTimeout );
+				curl_setopt( $curl, CURLOPT_CONNECTTIMEOUT, $wgNCBITaxonomyApiTimeout );
+				if ( $wgHTTPProxy ) {
+					curl_setopt( $curl, CURLOPT_PROXY, $wgHTTPProxy );
+				}
+			}
+			curl_setopt( $curl, CURLOPT_URL, $uri );
 			$result = curl_exec( $curl );
-			curl_close( $curl );
+			$code = curl_getinfo( $curl, CURLINFO_RESPONSE_CODE );
+			if ( $code === 500 ) {
+				// Maybe a temp failure. Give 1 more try
+				$result = curl_exec( $curl );
+				$code = curl_getinfo( $curl, CURLINFO_RESPONSE_CODE );
+			}
+			if ( $code !== 200 ) {
+				wfDebugLog( "NCBITaxonomyLookup", __METHOD__ . " Got code $code with result $result" );
+				$result = false;
+			}
+			// Don't call curl_close. We want it to keep connection open.
 		}
 		wfDebugLog( "NCBITaxonomyLookup",
 				__METHOD__ . ": got " . var_export( $result, true ) .
