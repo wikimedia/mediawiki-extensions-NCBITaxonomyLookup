@@ -41,6 +41,9 @@ class NCBITaxonomyLookupHooks {
 			try {
 				$xml = new SimpleXMLElement( $data );
 			} catch ( Exception $e ) {
+				// API not returning valid XML probably means a transient
+				// error like a 500. Reduce page cache to avoid caching bad values
+				$parser->getOutput()->updateCacheExpiry( 90 );
 				return [ '' ];
 			}
 			$found = $xml->xpath( $xpath );
@@ -49,6 +52,9 @@ class NCBITaxonomyLookupHooks {
 				// Internal to string conversion
 				$value = $found[0][0];
 			}
+		} else {
+			// Transient api error. Reduce cache time
+			$parser->getOutput()->updateCacheExpiry( 90 );
 		}
 		return [
 			$value,
