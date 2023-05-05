@@ -137,6 +137,16 @@ class NCBITaxonomyLookup {
 			}
 			// Don't call curl_close. We want it to keep connection open.
 		}
+
+		// Verify we actually got something that looks like a legit XML in response
+		// because NCBI API may return error messages under root <TaxaSet> as XML with 200 code
+		if ( strpos( $result, '<Taxon>' ) === false ) {
+			wfDebugLog( "NCBITaxonomyLookup",
+				__METHOD__ . ": got invalid XML from API " . var_export( $result, true )
+			);
+			return false;
+		}
+
 		wfDebugLog( "NCBITaxonomyLookup",
 				__METHOD__ . ": got " . var_export( $result, true ) .
 				" from internet."
