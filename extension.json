@@ -7,7 +7,7 @@
 	"version": "1.1",
 	"type": "parserhook",
 	"requires": {
-		"MediaWiki": ">= 1.35.0"
+		"MediaWiki": ">= 1.39.0"
 	},
 	"AutoloadClasses": {
 		"NCBITaxonomyLookup\\NCBITaxonomyLookupHooks": "includes/NCBITaxonomyLookupHooks.php",
