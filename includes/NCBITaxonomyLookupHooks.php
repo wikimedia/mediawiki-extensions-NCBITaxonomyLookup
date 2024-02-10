@@ -3,6 +3,7 @@
 namespace NCBITaxonomyLookup;
 
 use Exception;
+use InvalidArgumentException;
 use Parser;
 use SimpleXMLElement;
 
@@ -21,7 +22,6 @@ class NCBITaxonomyLookupHooks {
 	 * @param string|null $xpath
 	 *
 	 * @return array
-	 * @throws Exception
 	 */
 	public static function taxonomy( Parser $parser, $taxonomyId = null, $xpath = null ) {
 		if ( !$taxonomyId ) {
@@ -31,7 +31,7 @@ class NCBITaxonomyLookupHooks {
 			return [ '', 'markerType' => 'nowiki' ];
 		}
 		if ( !$xpath ) {
-			throw new Exception( 'The $xpath parameter must be set' );
+			throw new InvalidArgumentException( 'The $xpath parameter must be set' );
 		}
 
 		$data = NCBITaxonomyLookup::getCachedTaxonomyData( $taxonomyId );
