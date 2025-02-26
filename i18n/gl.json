@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Toliño"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Extrae datos da API de taxonomía NCBI nas páxinas do wiki"
+}
