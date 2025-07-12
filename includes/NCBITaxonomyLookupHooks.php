@@ -40,7 +40,7 @@ class NCBITaxonomyLookupHooks {
 			// Checking xpath
 			try {
 				$xml = new SimpleXMLElement( $data );
-			} catch ( Exception $e ) {
+			} catch ( Exception ) {
 				// API not returning valid XML probably means a transient
 				// error like a 500. Reduce page cache to avoid caching bad values
 				$parser->getOutput()->updateCacheExpiry( 90 );
