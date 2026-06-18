@@ -1,8 +1,9 @@
 {
 	"@metadata": {
 		"authors": [
-			"Nickthijssen1994"
+			"Nickthijssen1994",
+			"Siebrand"
 		]
 	},
-	"ncbitaxonomylookup-desc": "Haalt data op van de NCBI taxonomie API naar wiki pagina's"
+	"ncbitaxonomylookup-desc": "Haalt gegevens op van de NCBI taxonomie API naar wikipagina's"
 }
