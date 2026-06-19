@@ -1,0 +1,8 @@
+{
+	"@metadata": {
+		"authors": [
+			"Wizzard"
+		]
+	},
+	"ncbitaxonomylookup-desc": "Sťahuje údaje z NCBI taxonomy API do wiki stránok"
+}
